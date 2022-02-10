@@ -1,0 +1,2 @@
+# BankingAppUI
+SwiftUIを使用して銀行アプリのUIアニメーションを再現するプロジェクト
