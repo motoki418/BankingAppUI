@@ -5,6 +5,7 @@
 //  Created by nakamura motoki on 2022/02/10.
 //
 
+// ブロックの範囲が分かりにくくなっているので、}の後にどの部分かをコメントしています。
 import SwiftUI
 
 struct HomeView: View {
@@ -59,6 +60,7 @@ struct HomeView: View {
             
             // MARK: Using Geometry Reader for Setting Offset
             // The card will arrive from the top of the screen, in order do that we need to push the card to the top of the screen simply using geometry Reader to push the view to top
+            //　CreditCardに関しての指定
             GeometryReader{ proxy in
                 
                 let maxY = proxy.frame(in: .global).maxY
@@ -94,15 +96,15 @@ struct HomeView: View {
                 }
                 // 画面右端から文字を登場させる
                 .offset(x: animations[1] ? 0 : 200)
-            }//HStack Text("Choose a color")
+            }//HStack Text("Choose a color")とText("View all")を横並び
             .padding()
             
+            // 画面下部のGridViewに関しての指定を行う
             GeometryReader{ proxy in
-                
+
                 let size = proxy.size
                 
                 ZStack{
-                    
                     Color.black
                     // 画面下の黒い背景の角を丸くする
                         .clipShape(CustomCorner(corners: [.topLeft, .topRight], radius: 40))
@@ -116,18 +118,21 @@ struct HomeView: View {
                             if !colorGrid.removeFromView{
                                 RoundedRectangle(cornerRadius: 10)
                                     .fill(colorGrid.color)
+                                // GridItemのサイズ指定
+                                // 表示する際に高さを150から60に小さくして表示する
                                     .frame(width: 150, height: animations[3] ? 60 : 150)
                                     .matchedGeometryEffect(id: colorGrid.id, in: animation)
                                 // MARK: Rotating Cards
+                                // GridItemの回転方向
                                     .rotationEffect(.init(degrees: colorGrid.rotateCards ? 180 : 0))
                             }
                         }// ForEach
-                    }// ScrollView
+                    }// ZStack
+                    
                     // MARK: Applying Opacity with Scale Animation
                     // To Avoid This Creating a BG Overlay and hiding it
                     // So that it will look like the whole stack is Applying Opacity Animation
                     .overlay(
-                        
                         RoundedRectangle(cornerRadius: 10)
                             .fill(Color("BG"))
                             .frame(width: 150, height: animations[3] ? 60 : 150)
@@ -140,31 +145,36 @@ struct HomeView: View {
                 .vCenter()
                 
                 // MARK: ScrollView with Color Grids
+                // スクロークに関して
                 ScrollView(.vertical, showsIndicators: false){
-                    
+                    // GridCardを2つ横に並べてスペースを15空ける
                     let columns = Array(repeating: GridItem(.flexible(), spacing: 15), count: 2)
                     
                     LazyVGrid(columns: columns, spacing: 15){
+                        // ForEachでcolors配列からcolorGridに取り出し
                         ForEach(colors){colorGrid in
-                            
+                            // GridCardViewメソッドを呼び出して引数として渡す
                             GridCardView(colorGrid: colorGrid)
                         }// ForEach
                     }// LazyVGrid
+                    //GridCardの上40空ける
                     .padding(.top, 40)
                 }// ScrollView
                 .cornerRadius(40)
-            }// GeometryReader
+            }// GeometryReader GridViewに関して
             .padding(.top)
         }//VStack
         .vTop()
         .hCenter()
+        // GridCardの黒い背景を画面下部まで広げる
         .ignoresSafeArea(.container, edges: .bottom)
         .background(Color("BG"))
-        // 画面が表示されたときにanimateScreenメソッドを呼び出してアニメーションを起動する
+        // 画面が表示されたときにanimateScreenメソッドを呼び出してアニメーションさせる
         .onAppear(perform: animateScreen)
     }// body
     
     // MARK: Grid Card View
+    // GridCardに関してのメソッド
     @ViewBuilder
     func GridCardView(colorGrid: ColorGrid) -> some View{
         VStack{
@@ -266,13 +276,13 @@ struct HomeView: View {
     }// animateScreen()
     
     // MARK: Animated Credit Card
+    // CreditCardに関して
     @ViewBuilder
     func CreditCard() -> some View {
         ZStack{
             RoundedRectangle(cornerRadius: 20)
             // カードの色　最初はピンク
                 .fill(selectedColor)
-            
             VStack{
                 HStack{
                     // 左上の4つの丸を作成
@@ -288,9 +298,8 @@ struct HomeView: View {
                         .fontWeight(.semibold)
                 }//HStack
                 .hLeading()
-                //spacing: -12で二つの円を話すのではなく重ねる
+                //spacing: -12で二つの円を重ねる
                 HStack(spacing: -12){
-                    
                     Text("Jenna Ezarik")
                         .foregroundColor(.white)
                         .font(.title3)
@@ -312,6 +321,7 @@ struct HomeView: View {
             .hLeading()
             
             // MARK: Top Ring
+            // CreditCardの右上の縁について
             Circle()
                 .stroke(Color.white.opacity(0.5),lineWidth: 18)
                 .offset(x: 130, y: -120)
@@ -319,7 +329,6 @@ struct HomeView: View {
         // カードの大きさを調整
         .clipped()
         .padding()
-        
     }
 }
 
@@ -332,26 +341,32 @@ struct HomeView_Previews: PreviewProvider {
 // MARK: Extensions for Making UI Design Faster
 // Viewの位置を決める関数
 extension View{
+    // 左寄せ
     func hLeading() -> some View{
         self
             .frame(maxWidth: .infinity, alignment: .leading)
     }
+    // 右寄せ
     func hTrailing() -> some View{
         self
             .frame(maxWidth: .infinity, alignment: .trailing)
     }
+    // 横中央
     func hCenter() -> some View{
         self
             .frame(maxWidth: .infinity, alignment: .center)
     }
+    // 縦中央
     func vCenter() -> some View{
         self
             .frame(maxHeight: .infinity, alignment: .center)
     }
+    // 上寄せ
     func vTop() -> some View{
         self
             .frame(maxHeight: .infinity, alignment: .top)
     }
+    // 下寄せ
     func vBottom() -> some View{
         self
             .frame(maxHeight: .infinity, alignment: .bottom)
